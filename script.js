@@ -25,7 +25,9 @@ var SKELETON_LEAP_HEIGHT = 120; // px apex when leaping over player
 
 // HUD / overlay
 var scoreEl = document.getElementById("score");
-var livesEl = document.getElementById("lives");
+var livesEl = document.getElementById("lives"); // Keep for compatibility, but we'll use HP bar
+var hpBarEl = document.getElementById("hp-fill");
+var hpTextEl = document.getElementById("hp-text");
 var overlay = document.getElementById("overlay");
 var restartBtn = document.getElementById("restart");
 var resumeBtn = document.getElementById('resume-btn');
@@ -35,6 +37,7 @@ var score = 0;
 var highScore = parseInt(localStorage.getItem('highScore')) || 0;
 // Player and enemy combat stats
 var playerHP = 10;
+var maxPlayerHP = 10; // Define maximum HP for HP bar calculations
 var playerAttackPower = 1;
 var skeletonAttackPower = 1;
 var gameRunning = true; // start immediately
@@ -557,7 +560,30 @@ function updateHUD() {
         scoreEl.textContent = "Score: " + score;
     }
     
-    // Update HP display with visual feedback
+    // Update HP bar and text
+    if (hpBarEl && hpTextEl) {
+        // Calculate HP percentage
+        var hpPercentage = Math.max(0, (playerHP / maxPlayerHP) * 100);
+        hpBarEl.style.width = hpPercentage + '%';
+        hpTextEl.textContent = playerHP + '/' + maxPlayerHP;
+        
+        // Remove all HP status classes
+        hpBarEl.classList.remove('low', 'critical');
+        
+        // Apply visual styles based on HP percentage
+        if (hpPercentage <= 30) {
+            hpBarEl.classList.add('critical');
+        } else if (hpPercentage <= 50) {
+            hpBarEl.classList.add('low');
+        }
+        
+        // Add animation for HP change
+        hpBarEl.style.animation = 'none';
+        hpBarEl.offsetHeight; // Trigger reflow
+        hpBarEl.style.animation = 'life-change 0.3s ease-in-out';
+    }
+    
+    // Keep legacy HP display updated for compatibility (if it exists)
     if (livesEl) {
         livesEl.textContent = "HP: " + playerHP;
         
@@ -710,6 +736,10 @@ function collectPowerUp(type) {
     if (type === 'life') {
         // Life increases HP by 1
         playerHP = playerHP + 1;
+        // Update max HP if current HP exceeds it
+        if (playerHP > maxPlayerHP) {
+            maxPlayerHP = playerHP;
+        }
         updateHUD();
     } else if (type === 'shield') {
         // Add a shield
@@ -1112,6 +1142,185 @@ function updateShieldDisplay() {
     }
 }
 
+// Mobile controls setup
+function setupMobileControls() {
+    // Detect if the device is actually a mobile device
+    function isMobileDevice() {
+        // More strict mobile detection
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(userAgent);
+        
+        // Check if it's specifically NOT a desktop/laptop
+        const isDesktop = /windows nt|macintosh|linux/i.test(userAgent) && !/mobile|android/i.test(userAgent);
+        
+        // Check for touch capability
+        const hasTouchScreen = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
+        
+        // Check screen size (but be more restrictive)
+        const screenWidth = Math.max(window.screen.width, window.screen.height);
+        const screenHeight = Math.min(window.screen.width, window.screen.height);
+        const isSmallScreen = screenWidth <= 1024 && screenHeight <= 768;
+        
+        // Only consider it mobile if:
+        // 1. Has mobile user agent AND touch, OR
+        // 2. Has touch AND small screen AND NOT desktop
+        return (isMobileUserAgent && hasTouchScreen) || (hasTouchScreen && isSmallScreen && !isDesktop);
+    }
+    
+    // Add mobile class only if it's actually a mobile device
+    function updateMobileClass() {
+        const body = document.body;
+        const isMobile = isMobileDevice();
+        
+        console.log('Device detection:', {
+            userAgent: navigator.userAgent,
+            isMobile: isMobile,
+            hasTouch: 'ontouchstart' in window,
+            screenSize: window.screen.width + 'x' + window.screen.height,
+            windowSize: window.innerWidth + 'x' + window.innerHeight
+        });
+        
+        if (isMobile) {
+            body.classList.add('is-mobile');
+        } else {
+            body.classList.remove('is-mobile');
+        }
+    }
+    
+    // Set initial mobile class
+    updateMobileClass();
+    
+    // Update on resize (but be conservative about this)
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(updateMobileClass, 250);
+    });
+    
+    window.addEventListener('orientationchange', function() {
+        setTimeout(updateMobileClass, 200);
+    });
+
+    const mobileLeft = document.getElementById('mobile-left');
+    const mobileRight = document.getElementById('mobile-right');
+    const mobileJump = document.getElementById('mobile-jump');
+    const mobileRoll = document.getElementById('mobile-roll');
+    const mobileAttack = document.getElementById('mobile-attack');
+
+    // Dynamic scaling for different screen sizes
+    function adjustForScreenSize() {
+        const isMobile = document.body.classList.contains('is-mobile');
+        const gameWrap = document.getElementById('game-wrap');
+        const game = document.getElementById('game');
+        
+        if (isMobile && gameWrap && game) {
+            // Ensure game fills the screen properly on mobile
+            const screenWidth = window.innerWidth;
+            const screenHeight = window.innerHeight;
+            
+            gameWrap.style.width = screenWidth + 'px';
+            gameWrap.style.height = screenHeight + 'px';
+            game.style.width = screenWidth + 'px';
+            game.style.height = screenHeight + 'px';
+            
+            // Update GAME_WIDTH and GAME_HEIGHT for mobile
+            if (typeof GAME_WIDTH !== 'undefined') {
+                GAME_WIDTH = screenWidth;
+                GAME_HEIGHT = screenHeight;
+            }
+        }
+    }
+
+    // Adjust on load and resize
+    adjustForScreenSize();
+    window.addEventListener('resize', adjustForScreenSize);
+    window.addEventListener('orientationchange', function() {
+        setTimeout(adjustForScreenSize, 100); // Small delay for orientation change
+    });
+
+    // Only set up mobile controls if device is mobile
+    if (!isMobileDevice()) {
+        console.log('Desktop device detected - skipping mobile controls setup');
+        return; // Exit early for desktop devices
+    }
+
+    console.log('Mobile device detected - setting up mobile controls');
+
+    // Prevent default touch behaviors that interfere with game
+    document.addEventListener('touchstart', function(e) {
+        if (e.target.closest('#mobile-controls')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    document.addEventListener('touchmove', function(e) {
+        if (e.target.closest('#mobile-controls')) {
+            e.preventDefault();
+        }
+    }, { passive: false });
+
+    // Movement controls
+    if (mobileLeft) {
+        mobileLeft.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            keysPressed.left = true;
+            facingLeft = true;
+            if (character) character.classList.add('facing-left');
+        });
+        
+        mobileLeft.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            keysPressed.left = false;
+        });
+        
+        mobileLeft.addEventListener('touchcancel', function(e) {
+            e.preventDefault();
+            keysPressed.left = false;
+        });
+    }
+
+    if (mobileRight) {
+        mobileRight.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            keysPressed.right = true;
+            facingLeft = false;
+            if (character) character.classList.remove('facing-left');
+        });
+        
+        mobileRight.addEventListener('touchend', function(e) {
+            e.preventDefault();
+            keysPressed.right = false;
+        });
+        
+        mobileRight.addEventListener('touchcancel', function(e) {
+            e.preventDefault();
+            keysPressed.right = false;
+        });
+    }
+
+    // Action controls
+    if (mobileJump) {
+        mobileJump.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            jump();
+        });
+    }
+
+    if (mobileRoll) {
+        mobileRoll.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            roll();
+        });
+    }
+
+    if (mobileAttack) {
+        mobileAttack.addEventListener('touchstart', function(e) {
+            e.preventDefault();
+            attack();
+        });
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Reset game state
     gameRunning = true;
@@ -1186,6 +1395,29 @@ document.addEventListener('DOMContentLoaded', function() {
             togglePause();
         });
     }
+
+    // Setup mobile touch controls
+    setupMobileControls();
+    
+    // Double-check mobile detection after everything loads
+    setTimeout(function() {
+        const body = document.body;
+        const hasClass = body.classList.contains('is-mobile');
+        const userAgent = navigator.userAgent.toLowerCase();
+        const isDefinitelyDesktop = /windows nt|macintosh|linux/i.test(userAgent) && !/mobile|android/i.test(userAgent);
+        
+        // Force remove mobile class if this is definitely a desktop
+        if (isDefinitelyDesktop && hasClass) {
+            console.log('Forcing removal of mobile class on desktop device');
+            body.classList.remove('is-mobile');
+        }
+        
+        console.log('Final mobile detection state:', {
+            hasMobileClass: body.classList.contains('is-mobile'),
+            userAgent: navigator.userAgent,
+            isDesktop: isDefinitelyDesktop
+        });
+    }, 500);
 
     // Resolve power-up DOM elements after DOM is ready
     powerUpElements.life = document.querySelector('.power-up.life');

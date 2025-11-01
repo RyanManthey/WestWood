@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>Jump Game</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -15,6 +16,13 @@
             <!-- HUD inside game area -->
             <div id="hud">
                 <div class="hud-left">
+                    <!-- HP Bar positioned above pause button -->
+                    <div id="hp-bar-container">
+                        <div id="hp-bar">
+                            <div id="hp-fill"></div>
+                        </div>
+                        <span id="hp-text">10/10</span>
+                    </div>
                     <button id="pause-btn">Pause</button>
                 </div>
                 <div class="hud-right">
@@ -23,7 +31,6 @@
                         <button id="reset-high-score">Reset High Score</button>
                     </div>
                     <span id="score">Score: 0</span>
-                    <span id="lives">HP: 10</span>
                     <div class="shield-counter">
                         <span id="shield-count">Shields: 0</span>
                         <div class="shield-icons"></div>
@@ -37,6 +44,19 @@
             <div class="skeleton enemy"></div>
             <div class="power-up shield hidden"></div>
             <div class="power-up life hidden"></div>
+            
+            <!-- Mobile Controls -->
+            <div id="mobile-controls" class="mobile-only">
+                <div class="mobile-controls-left">
+                    <button id="mobile-left" class="mobile-btn direction-btn">←</button>
+                    <button id="mobile-right" class="mobile-btn direction-btn">→</button>
+                </div>
+                <div class="mobile-controls-right">
+                    <button id="mobile-jump" class="mobile-btn action-btn">Jump</button>
+                    <button id="mobile-roll" class="mobile-btn action-btn">Roll</button>
+                    <button id="mobile-attack" class="mobile-btn action-btn">Attack</button>
+                </div>
+            </div>
         </div>
     </div>
 

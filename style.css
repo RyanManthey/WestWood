@@ -298,6 +298,55 @@ body.game-over .bg-layer {
     position: absolute;
     top: 0;
     left: 0;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* HP Bar Styles */
+#hp-bar-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 2px;
+}
+
+#hp-bar {
+    width: 100px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+}
+
+#hp-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #FF5252 0%, #FF1744 50%, #F44336 100%);
+    transition: width 0.3s ease-in-out, background 0.3s ease-in-out;
+    border-radius: 5px;
+    width: 100%;
+}
+
+#hp-fill.low {
+    background: linear-gradient(90deg, #D32F2F 0%, #C62828 100%);
+}
+
+#hp-fill.critical {
+    background: linear-gradient(90deg, #B71C1C 0%, #AD1457 100%);
+    animation: hp-pulse 0.8s ease-in-out infinite alternate;
+}
+
+#hp-text {
+    font-size: 9px;
+    color: rgba(255, 255, 255, 0.9);
+    text-align: center;
+    width: 100px;
+}
+
+@keyframes hp-pulse {
+    from { opacity: 0.7; }
+    to { opacity: 1; }
 }
 
 .hud-right {
@@ -447,3 +496,325 @@ body.game-over .bg-layer {
 
 /* controls - positioned inside game area at bottom */
 /* (controls removed) */
+
+/* Mobile Controls */
+.mobile-only {
+    display: none !important; /* Force hide by default */
+}
+
+/* Only show mobile controls on actual mobile devices */
+.is-mobile .mobile-only {
+    display: block !important;
+}
+
+/* Explicitly hide mobile controls on desktop devices */
+@media (hover: hover) and (pointer: fine) {
+    .mobile-only {
+        display: none !important;
+    }
+}
+
+#mobile-controls {
+    position: absolute;
+    bottom: 20px;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    padding: 0 20px;
+    z-index: 15;
+    pointer-events: none;
+}
+
+.mobile-controls-left,
+.mobile-controls-right {
+    display: flex;
+    gap: 10px;
+    pointer-events: auto;
+}
+
+.mobile-controls-right {
+    flex-direction: column;
+    gap: 8px;
+}
+
+.mobile-btn {
+    background: rgba(255, 255, 255, 0.9);
+    border: 2px solid rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+.direction-btn {
+    width: 50px;
+    height: 50px;
+    font-size: 24px;
+}
+
+.action-btn {
+    width: 60px;
+    height: 40px;
+    font-size: 12px;
+}
+
+.mobile-btn:active {
+    background: rgba(200, 200, 200, 0.9);
+    transform: scale(0.95);
+}
+
+.mobile-btn:hover {
+    background: rgba(230, 230, 230, 0.9);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+    /* Only apply mobile styles if device is actually mobile */
+    .is-mobile #game-wrap {
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden;
+    }
+    
+    .is-mobile #game {
+        width: 100%;
+        height: 100%;
+        min-height: 100vh;
+    }
+    
+    /* Adjust HUD for mobile */
+    .is-mobile #hud {
+        padding: 10px;
+        font-size: 12px;
+    }
+    
+    .is-mobile #hp-bar {
+        width: 80px;
+        height: 10px;
+    }
+    
+    .is-mobile #hp-text {
+        font-size: 8px;
+        width: 80px;
+    }
+    
+    .is-mobile #pause-btn {
+        font-size: 9px;
+        min-width: 35px;
+    }
+    
+    .is-mobile .hud-right {
+        gap: 4px;
+    }
+    
+    .is-mobile .score-container {
+        gap: 6px;
+    }
+    
+    .is-mobile #reset-high-score {
+        font-size: 9px;
+        padding: 1px 4px;
+    }
+    
+    /* Character scaling for mobile */
+    .is-mobile #character {
+        width: 60px;
+        height: 60px;
+    }
+    
+    .is-mobile .skeleton {
+        width: 50px;
+        height: 50px;
+    }
+    
+    /* Overlay adjustments */
+    .is-mobile .overlay-content {
+        padding: 15px;
+        margin: 20px;
+        max-width: 90%;
+    }
+    
+    .is-mobile #restart, .is-mobile #resume-btn {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* Extra small screens - only for actual mobile devices */
+    .is-mobile #hud {
+        font-size: 10px;
+        padding: 8px;
+    }
+    
+    .is-mobile #hp-bar {
+        width: 70px;
+        height: 8px;
+    }
+    
+    .is-mobile #hp-text {
+        font-size: 7px;
+        width: 70px;
+    }
+    
+    .is-mobile #pause-btn {
+        font-size: 8px;
+        min-width: 30px;
+    }
+    
+    .is-mobile .mobile-btn {
+        font-size: 12px;
+    }
+    
+    .is-mobile .direction-btn {
+        width: 45px;
+        height: 45px;
+        font-size: 20px;
+    }
+    
+    .is-mobile .action-btn {
+        width: 55px;
+        height: 35px;
+        font-size: 10px;
+    }
+    
+    .is-mobile #character {
+        width: 50px;
+        height: 50px;
+    }
+    
+    .is-mobile .skeleton {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media screen and (orientation: landscape) and (max-height: 500px) {
+    /* Landscape mobile optimization - only for actual mobile devices */
+    .is-mobile #mobile-controls {
+        bottom: 10px;
+        padding: 0 15px;
+    }
+    
+    .is-mobile .mobile-controls-right {
+        flex-direction: row;
+        gap: 6px;
+    }
+    
+    .is-mobile .action-btn {
+        width: 50px;
+        height: 35px;
+    }
+    
+    .is-mobile #hud {
+        padding: 5px;
+        font-size: 9px;
+    }
+    
+    .is-mobile #hp-bar {
+        width: 60px;
+        height: 6px;
+    }
+    
+    /* Make character and enemies more visible in landscape */
+    .is-mobile #character {
+        width: 45px;
+        height: 45px;
+    }
+    
+    .is-mobile .skeleton {
+        width: 35px;
+        height: 35px;
+    }
+}
+
+/* High DPI displays (Retina, etc.) */
+@media screen and (-webkit-min-device-pixel-ratio: 2), 
+       screen and (min-resolution: 192dpi) {
+    .mobile-btn {
+        border-width: 1px; /* Thinner borders on high DPI */
+    }
+    
+    #hud {
+        font-weight: 400; /* Better text rendering */
+    }
+}
+
+/* Very large screens - prevent game from becoming too big */
+@media screen and (min-width: 1200px) {
+    #game-wrap {
+        max-width: 1200px;
+        margin: 0 auto;
+        box-shadow: 0 0 20px rgba(0,0,0,0.5);
+    }
+}
+
+/* Accessibility - reduce motion for users who prefer it */
+@media (prefers-reduced-motion: reduce) {
+    .mobile-btn {
+        transition: none;
+    }
+    
+    #hp-fill {
+        transition: width 0.1s ease;
+    }
+    
+    .overlay-content {
+        transition: none;
+    }
+}
+
+/* Prevent text selection and zoom on mobile */
+@media screen and (max-width: 768px) {
+    .is-mobile body {
+        -webkit-text-size-adjust: 100%;
+        -ms-text-size-adjust: 100%;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        overflow: hidden;
+        touch-action: manipulation; /* Prevent double-tap zoom */
+    }
+    
+    .is-mobile * {
+        -webkit-touch-callout: none;
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    /* Ensure game always fills screen */
+    .is-mobile html, .is-mobile body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        position: fixed;
+        overflow: hidden;
+    }
+    
+    /* Improve performance on mobile */
+    .is-mobile #game {
+        transform: translateZ(0); /* Hardware acceleration */
+        -webkit-transform: translateZ(0);
+        will-change: transform;
+    }
+    
+    .is-mobile #character, .is-mobile .skeleton {
+        transform: translateZ(0);
+        -webkit-transform: translateZ(0);
+        will-change: transform, left, top;
+    }
+    
+    /* Better power-up scaling */
+    .is-mobile .power-up {
+        width: 20px;
+        height: 20px;
+    }
+}
