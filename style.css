@@ -527,16 +527,20 @@ body.game-over .bg-layer {
     pointer-events: none;
 }
 
-.mobile-controls-left,
-.mobile-controls-right {
+.mobile-controls-left {
     display: flex;
     gap: 10px;
     pointer-events: auto;
+    align-self: flex-end;
 }
 
 .mobile-controls-right {
+    display: flex;
     flex-direction: column;
     gap: 8px;
+    pointer-events: auto;
+    align-self: flex-end;
+    align-items: flex-end;
 }
 
 .mobile-btn {
@@ -626,13 +630,13 @@ body.game-over .bg-layer {
     
     /* Character scaling for mobile */
     .is-mobile #character {
-        width: 60px;
-        height: 60px;
+        width: 80px;
+        height: 80px;
     }
     
     .is-mobile .skeleton {
-        width: 50px;
-        height: 50px;
+        width: 70px;
+        height: 70px;
     }
     
     /* Overlay adjustments */
@@ -687,13 +691,13 @@ body.game-over .bg-layer {
     }
     
     .is-mobile #character {
-        width: 50px;
-        height: 50px;
+        width: 70px;
+        height: 70px;
     }
     
     .is-mobile .skeleton {
-        width: 40px;
-        height: 40px;
+        width: 60px;
+        height: 60px;
     }
 }
 
@@ -726,13 +730,13 @@ body.game-over .bg-layer {
     
     /* Make character and enemies more visible in landscape */
     .is-mobile #character {
-        width: 45px;
-        height: 45px;
+        width: 65px;
+        height: 65px;
     }
     
     .is-mobile .skeleton {
-        width: 35px;
-        height: 35px;
+        width: 55px;
+        height: 55px;
     }
 }
 
