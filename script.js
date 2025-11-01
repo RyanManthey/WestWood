@@ -1220,11 +1220,24 @@ function setupMobileControls() {
     let resizeTimeout;
     window.addEventListener('resize', function() {
         clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(updateMobileClass, 250);
+        resizeTimeout = setTimeout(function() {
+            updateMobileClass();
+            adjustForScreenSize();
+        }, 250);
     });
     
     window.addEventListener('orientationchange', function() {
-        setTimeout(updateMobileClass, 200);
+        setTimeout(function() {
+            updateMobileClass();
+            adjustForScreenSize();
+            // Force layout recalculation after orientation change
+            const mobileControls = document.getElementById('mobile-controls');
+            if (mobileControls) {
+                mobileControls.style.display = 'none';
+                mobileControls.offsetHeight; // Force reflow
+                mobileControls.style.display = 'flex';
+            }
+        }, 300);
     });
 
     const mobileLeft = document.getElementById('mobile-left');

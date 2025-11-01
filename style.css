@@ -516,7 +516,7 @@ body.game-over .bg-layer {
 }
 
 #mobile-controls {
-    position: absolute;
+    position: fixed;
     bottom: 20px;
     left: 20px;
     right: 20px;
@@ -526,12 +526,14 @@ body.game-over .bg-layer {
     z-index: 15;
     pointer-events: none;
     height: auto;
+    width: calc(100% - 40px);
 }
 
 .mobile-controls-left {
     display: flex;
     gap: 10px;
     pointer-events: auto;
+    order: 1;
 }
 
 .mobile-controls-right {
@@ -539,6 +541,7 @@ body.game-over .bg-layer {
     flex-direction: column;
     gap: 8px;
     pointer-events: auto;
+    order: 2;
 }
 
 .mobile-btn {
@@ -628,13 +631,13 @@ body.game-over .bg-layer {
     
     /* Character scaling for mobile - apply to all small screens */
     #character {
-        width: 80px !important;
-        height: 80px !important;
+        width: 120px !important;
+        height: 120px !important;
     }
     
     .skeleton {
-        width: 70px !important;
-        height: 70px !important;
+        width: 100px !important;
+        height: 100px !important;
     }
     
     /* Overlay adjustments */
@@ -697,13 +700,13 @@ body.game-over .bg-layer {
     
     /* Character scaling for mobile */
     .is-mobile #character {
-        width: 80px;
-        height: 80px;
+        width: 120px;
+        height: 120px;
     }
     
     .is-mobile .skeleton {
-        width: 70px;
-        height: 70px;
+        width: 100px;
+        height: 100px;
     }
     
     .is-mobile .overlay-content {
@@ -757,13 +760,13 @@ body.game-over .bg-layer {
     }
     
     #character {
-        width: 70px !important;
-        height: 70px !important;
+        width: 100px !important;
+        height: 100px !important;
     }
     
     .skeleton {
-        width: 60px !important;
-        height: 60px !important;
+        width: 85px !important;
+        height: 85px !important;
     }
     
     /* Also apply mobile-specific styles */
@@ -804,13 +807,13 @@ body.game-over .bg-layer {
     }
     
     .is-mobile #character {
-        width: 70px;
-        height: 70px;
+        width: 100px;
+        height: 100px;
     }
     
     .is-mobile .skeleton {
-        width: 60px;
-        height: 60px;
+        width: 85px;
+        height: 85px;
     }
 }
 
@@ -820,11 +823,17 @@ body.game-over .bg-layer {
         bottom: 10px;
         left: 15px;
         right: 15px;
+        width: calc(100% - 30px);
+    }
+    
+    .mobile-controls-left {
+        order: 1; /* Ensure left controls stay on left */
     }
     
     .mobile-controls-right {
         flex-direction: row;
         gap: 6px;
+        order: 2; /* Ensure right controls stay on right */
     }
     
     .action-btn {
@@ -844,13 +853,13 @@ body.game-over .bg-layer {
     
     /* Make character and enemies visible in landscape */
     #character {
-        width: 65px !important;
-        height: 65px !important;
+        width: 90px !important;
+        height: 90px !important;
     }
     
     .skeleton {
-        width: 55px !important;
-        height: 55px !important;
+        width: 75px !important;
+        height: 75px !important;
     }
     
     /* Also apply mobile-specific styles */
@@ -858,11 +867,17 @@ body.game-over .bg-layer {
         bottom: 10px;
         left: 15px;
         right: 15px;
+        width: calc(100% - 30px);
+    }
+    
+    .is-mobile .mobile-controls-left {
+        order: 1;
     }
     
     .is-mobile .mobile-controls-right {
         flex-direction: row;
         gap: 6px;
+        order: 2;
     }
     
     .is-mobile .action-btn {
@@ -881,13 +896,32 @@ body.game-over .bg-layer {
     }
     
     .is-mobile #character {
-        width: 65px;
-        height: 65px;
+        width: 90px;
+        height: 90px;
     }
     
     .is-mobile .skeleton {
-        width: 55px;
-        height: 55px;
+        width: 75px;
+        height: 75px;
+    }
+}
+
+/* Portrait orientation - ensure buttons stay in correct positions */
+@media screen and (orientation: portrait) {
+    #mobile-controls {
+        flex-direction: row;
+        justify-content: space-between;
+    }
+    
+    .mobile-controls-left {
+        order: 1;
+        justify-self: flex-start;
+    }
+    
+    .mobile-controls-right {
+        order: 2;
+        justify-self: flex-end;
+        flex-direction: column;
     }
 }
 
