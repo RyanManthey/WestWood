@@ -548,7 +548,7 @@ function attack() {
     setTimeout(function() {
         isAttacking = false;
         character.classList.remove('attacking');
-    }, 400); // ~400ms for attack animation
+    }, 250); // ~250ms for attack animation (increased attack speed)
 }
 
 function updateHUD() {
