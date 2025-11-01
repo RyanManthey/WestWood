@@ -1,0 +1,449 @@
+#game-wrap {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+    align-items: center; /* center vertically in the viewport */
+    height: 100vh; /* fill viewport height to allow true vertical centering */
+}
+
+/* Center the whole page and remove default body margin so the game stays centered */
+html, body {
+	height: 100%;
+	background-color: black;
+}
+body {
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	margin: 0;
+}
+
+/* Larger game area: keep internal coordinates as original pixels and scale the whole box */
+#game {
+    width: 800px;
+    height: 300px;
+    border: 1px solid black;
+    position: relative;
+    overflow: hidden; /* hide scrolling backgrounds beyond edges */
+    background: transparent; /* remove blue background */
+}
+
+/* Parallax background layers */
+.bg-layer {
+    position: absolute;
+    inset: 0; /* top:0; right:0; bottom:0; left:0 */
+    background-repeat: repeat-x;
+    background-position: 0 0;
+    background-size: auto 100%; /* scale height to game, keep aspect */
+    pointer-events: none;
+}
+
+.bg-layer.back {
+    background-image: url('back.png');
+    z-index: 0;
+    --tile-w: 180px; /* 144x240 image scaled to 300px tall => 180px wide tile */
+    animation: bg-scroll 40s linear infinite;
+}
+
+.bg-layer.far {
+    background-image: url('far.png');
+    z-index: 1;
+    --tile-w: 180px;
+    animation: bg-scroll 25s linear infinite;
+}
+
+@keyframes bg-scroll {
+    from { background-position: 0 0; }
+    to   { background-position: calc(var(--tile-w) * -1) 0; }
+}
+
+/* Pause background layers when the game is paused */
+body.game-paused .bg-layer {
+    animation-play-state: paused;
+}
+
+/* Also stop backgrounds on game over */
+body.game-over .bg-layer {
+    animation-play-state: paused;
+}
+
+#character {
+    width: 180px;
+    height: 120px;
+    background-color: transparent;
+    background-image: url('Player/spr_idle.gif');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: bottom center;
+    position: absolute;
+    left: 20px; /* initial horizontal offset */
+    top: 200px; /* lowered by 15px (was 185px) */
+    transition: none;
+    z-index: 2;
+    image-rendering: pixelated; /* keep pixel art crisp */
+    transform-origin: center;
+    margin: 0;
+    padding: 0;
+}
+
+#character.facing-left {
+    transform: scaleX(-1);
+}
+
+#character.running {
+    background-image: url('Player/spr_run.gif');
+}
+
+#character.jumping {
+    background-image: url('Player/spr_jump.gif');
+}
+
+#character.falling {
+    background-image: url('Player/spr_jump.gif');
+}
+
+#character.rolling {
+    background-image: url('Player/spr_roll.gif');
+}
+
+#character.attacking {
+    background-image: url('Player/spr_attack.gif');
+}
+
+#character.hit {
+    background-image: url('Player/spr_hurt.gif');
+}
+
+#character.death {
+    background-image: url('Player/spr_death.gif');
+}
+
+#character.animate {
+    animation: jump 500ms ease-out;
+    animation-fill-mode: forwards;
+}
+
+/* Skeleton Enemy (from Skel folder GIFs) */
+.skeleton {
+    width: 150px;
+    height: 150px;
+    background-image: url('enemies/Skel/skeleton_idle.gif');
+    background-repeat: no-repeat;
+    background-size: contain;
+    background-position: bottom center;
+    position: absolute;
+    top: 150px; /* align bottom to ground: 300 (game height) - 150 (skeleton height) */
+    left: 800px; /* start off-screen right */
+    z-index: 2;
+    image-rendering: pixelated;
+    transform-origin: center;
+    margin: 0;
+    padding: 0;
+}
+
+.skeleton.moving {
+    background-image: url('enemies/Skel/skeleton_walk.gif');
+}
+
+.skeleton.attacking {
+    background-image: url('enemies/Skel/skeleton_attack.gif');
+}
+
+.skeleton.hurt {
+    background-image: url('enemies/Skel/skeleton_hurt.gif');
+}
+
+.skeleton.death {
+    background-image: url('enemies/Skel/skeleton_death.gif');
+}
+
+.skeleton.jumping {
+    background-image: url('enemies/Skel/skeleton_jump.gif');
+}
+
+.skeleton.facing-left {
+    transform: scaleX(-1);
+}
+
+/* Power-ups */
+.power-up {
+    width: 24px;
+    height: 24px;
+    position: absolute;
+    z-index: 2;
+    border-radius: 50%;
+    transition: transform 0.2s, opacity 0.2s;
+}
+
+.power-up.hidden {
+    display: none;
+}
+
+.power-up.life {
+    background: radial-gradient(circle, #ff69b4, #ff1493);
+    box-shadow: 0 0 10px #ff1493;
+}
+
+.power-up.shield {
+    background: radial-gradient(circle, #4fc3f7, #0288d1);
+    box-shadow: 0 0 10px #0288d1;
+}
+
+.power-up.spawn {
+    animation: power-up-spawn 0.3s ease-out;
+}
+
+@keyframes power-up-spawn {
+    0% {
+        transform: scale(0);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.2);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* Shield visual effect on character */
+#character.shielded {
+    position: relative;
+}
+
+#character.shielded::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border: 3px solid #4fc3f7;
+    border-radius: 50%;
+    animation: shield-pulse 1s ease-in-out infinite;
+    pointer-events: none;
+}
+
+@keyframes shield-pulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+    50% {
+        opacity: 1;
+        transform: scale(1.1);
+    }
+}
+
+/* HUD Styles - positioned inside game area */
+#hud {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-between;
+    font-family: Arial, sans-serif;
+    font-size: 10px;
+    color: rgba(255,255,255,0.92);
+    z-index: 10;
+    pointer-events: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* Debug hitbox overlays (temporary) */
+.hitbox-debug {
+    position: absolute;
+    border: 1px dashed rgba(255,255,255,0.6);
+    box-sizing: border-box;
+    pointer-events: none;
+    z-index: 9;
+}
+.player-hitbox-debug {
+    border-color: rgba(0, 255, 0, 0.8);
+    background: rgba(0, 255, 0, 0.1);
+}
+.skeleton-hitbox-debug {
+    border-color: rgba(255, 0, 0, 0.8);
+    background: rgba(255, 0, 0, 0.1);
+}
+
+/* Debug attack range overlays */
+.range-debug {
+    position: absolute;
+    pointer-events: none;
+    z-index: 8;
+}
+.player-range-debug {
+    background: rgba(0, 255, 255, 0.9); /* cyan line */
+}
+.skeleton-range-debug {
+    background: rgba(255, 165, 0, 0.9); /* orange line */
+}
+
+#hud > * {
+    pointer-events: auto;
+}
+
+.hud-left, .hud-right {
+    display: flex;
+    gap: 6px;
+    align-items: flex-start;
+    padding: 0;
+    margin: 0;
+}
+
+.hud-left {
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.hud-right {
+    flex-direction: column;
+    align-items: flex-end;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.score-container {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+#pause-btn {
+    padding: 0;
+    margin: 0;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 2px;
+    cursor: pointer;
+    font-size: 10px;
+    line-height: 1.1;
+    width: auto;
+    min-width: 40px;
+    height: auto;
+}
+
+#pause-btn:hover {
+    background: #45a049;
+}
+
+#reset-high-score {
+    padding: 2px 6px;
+    font-size: 11px;
+    background: #ff5252;
+    color: white;
+    border: none;
+    border-radius: 3px;
+    cursor: pointer;
+}
+
+#reset-high-score:hover {
+    background: #ff1744;
+}
+
+.shield-counter {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.shield-icons {
+    display: flex;
+    gap: 3px;
+}
+
+.shield-icon {
+    width: 12px;
+    height: 12px;
+    background: radial-gradient(circle, #4fc3f7, #0288d1);
+    border-radius: 50%;
+    box-shadow: 0 0 4px #0288d1;
+}
+
+@keyframes life-change {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+
+
+.overlay.hidden { display: none; }
+.overlay {
+    position: fixed;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    backdrop-filter: blur(2px);
+    transition: all 0.3s ease-out;
+}
+
+#pause-overlay {
+    background: rgba(0,0,0,0.3);
+}
+
+#game-over-overlay {
+    background: rgba(0,0,0,0.7);
+}
+
+.overlay-content {
+    background: white;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transform: translateY(0);
+    transition: transform 0.3s ease-out;
+}
+
+.hidden .overlay-content {
+    transform: translateY(-20px);
+}
+
+#restart, #resume-btn {
+    margin-top: 16px;
+    padding: 10px 20px;
+    font-size: 16px;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+#restart:hover, #resume-btn:hover {
+    background: #45a049;
+}
+
+@keyframes jump {
+    0% { top: 200px; }
+    50% { top: 115px; }
+    100% { top: 200px; }
+}
+
+@keyframes bg-move {
+	from { background-position: 0 0, 0 0; }
+	to   { background-position: 0 0, -200px 0; }
+}
+
+@keyframes bg-move-front {
+	from { background-position: 0 0, 0 220px, 0 0; }
+	to   { background-position: -160px 0, -600px 220px, 0 0; }
+}
+
+@keyframes bg-move-back {
+	from { background-position: 0 220px, 0 0; }
+	to   { background-position: -600px 220px, 0 0; }
+}
+
+/* removed trees/grass/clouds styles */
+
+/* controls - positioned inside game area at bottom */
+/* (controls removed) */

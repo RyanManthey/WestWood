@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Jump Game</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-wrap">
+        <div id="game">
+            <!-- Parallax background layers: back (farthest), far (closest) -->
+            <div class="bg-layer back" aria-hidden="true"></div>
+            <div class="bg-layer far" aria-hidden="true"></div>
+            
+            <!-- HUD inside game area -->
+            <div id="hud">
+                <div class="hud-left">
+                    <button id="pause-btn">Pause</button>
+                </div>
+                <div class="hud-right">
+                    <div class="score-container">
+                        <span id="high-score">High Score: 0</span>
+                        <button id="reset-high-score">Reset High Score</button>
+                    </div>
+                    <span id="score">Score: 0</span>
+                    <span id="lives">HP: 10</span>
+                    <div class="shield-counter">
+                        <span id="shield-count">Shields: 0</span>
+                        <div class="shield-icons"></div>
+                    </div>
+                </div>
+            </div>
+            
+            
+            
+            <div id="character"></div>
+            <div class="skeleton enemy"></div>
+            <div class="power-up shield hidden"></div>
+            <div class="power-up life hidden"></div>
+        </div>
+    </div>
+
+    <div id="pause-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h2>Game Paused</h2>
+            <p>Press P or click Resume to continue</p>
+            <button id="resume-btn">Resume</button>
+        </div>
+    </div>
+
+    <div id="game-over-overlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h2>Game Over</h2>
+            <p id="final-score">Final Score: 0</p>
+            <button id="restart">Restart</button>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
