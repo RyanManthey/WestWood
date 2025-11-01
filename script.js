@@ -1144,27 +1144,53 @@ function updateShieldDisplay() {
 
 // Mobile controls setup
 function setupMobileControls() {
+    // Quick Android check - if it's Android, it's definitely mobile
+    const isAndroid = /android/i.test(navigator.userAgent);
+    if (isAndroid) {
+        console.log('Android device detected - enabling mobile controls');
+        document.body.classList.add('is-mobile');
+    }
+    
     // Detect if the device is actually a mobile device
     function isMobileDevice() {
-        // More strict mobile detection
+        // More comprehensive mobile detection
         const userAgent = navigator.userAgent.toLowerCase();
+        
+        // Check for mobile user agents (including Android)
         const isMobileUserAgent = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(userAgent);
         
-        // Check if it's specifically NOT a desktop/laptop
-        const isDesktop = /windows nt|macintosh|linux/i.test(userAgent) && !/mobile|android/i.test(userAgent);
+        // Check specifically for Android (which might not always include "mobile")
+        const isAndroid = /android/i.test(userAgent);
+        
+        // Check if it's specifically a desktop OS (but allow Android)
+        const isDesktopOS = /windows nt|macintosh|linux/i.test(userAgent) && !/android|mobile/i.test(userAgent);
         
         // Check for touch capability
         const hasTouchScreen = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (navigator.msMaxTouchPoints > 0);
         
-        // Check screen size (but be more restrictive)
+        // Check screen size
         const screenWidth = Math.max(window.screen.width, window.screen.height);
         const screenHeight = Math.min(window.screen.width, window.screen.height);
         const isSmallScreen = screenWidth <= 1024 && screenHeight <= 768;
         
-        // Only consider it mobile if:
-        // 1. Has mobile user agent AND touch, OR
-        // 2. Has touch AND small screen AND NOT desktop
-        return (isMobileUserAgent && hasTouchScreen) || (hasTouchScreen && isSmallScreen && !isDesktop);
+        // More permissive mobile detection:
+        // 1. Has mobile user agent (includes most phones/tablets)
+        // 2. Is Android (covers Android devices that might not have "mobile" in UA)
+        // 3. Has touch AND small screen AND not desktop OS
+        const isMobile = isMobileUserAgent || isAndroid || (hasTouchScreen && isSmallScreen && !isDesktopOS);
+        
+        console.log('Mobile detection details:', {
+            userAgent: userAgent,
+            isMobileUserAgent: isMobileUserAgent,
+            isAndroid: isAndroid,
+            isDesktopOS: isDesktopOS,
+            hasTouchScreen: hasTouchScreen,
+            screenSize: screenWidth + 'x' + screenHeight,
+            isSmallScreen: isSmallScreen,
+            finalResult: isMobile
+        });
+        
+        return isMobile;
     }
     
     // Add mobile class only if it's actually a mobile device
@@ -1404,17 +1430,25 @@ document.addEventListener('DOMContentLoaded', function() {
         const body = document.body;
         const hasClass = body.classList.contains('is-mobile');
         const userAgent = navigator.userAgent.toLowerCase();
+        const isAndroid = /android/i.test(userAgent);
         const isDefinitelyDesktop = /windows nt|macintosh|linux/i.test(userAgent) && !/mobile|android/i.test(userAgent);
         
-        // Force remove mobile class if this is definitely a desktop
-        if (isDefinitelyDesktop && hasClass) {
+        // Only force remove mobile class if this is definitely a desktop AND not Android
+        if (isDefinitelyDesktop && !isAndroid && hasClass) {
             console.log('Forcing removal of mobile class on desktop device');
             body.classList.remove('is-mobile');
+        }
+        
+        // Force add mobile class for Android devices that might have been missed
+        if (isAndroid && !hasClass) {
+            console.log('Forcing addition of mobile class for Android device');
+            body.classList.add('is-mobile');
         }
         
         console.log('Final mobile detection state:', {
             hasMobileClass: body.classList.contains('is-mobile'),
             userAgent: navigator.userAgent,
+            isAndroid: isAndroid,
             isDesktop: isDefinitelyDesktop
         });
     }, 500);

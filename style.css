@@ -507,8 +507,9 @@ body.game-over .bg-layer {
     display: block !important;
 }
 
-/* Explicitly hide mobile controls on desktop devices */
-@media (hover: hover) and (pointer: fine) {
+/* Explicitly hide mobile controls only on desktop devices with precise pointers */
+@media (hover: hover) and (pointer: fine) and (min-width: 1025px) {
+    /* Only apply this rule on larger screens to avoid blocking tablets */
     .mobile-only {
         display: none !important;
     }
